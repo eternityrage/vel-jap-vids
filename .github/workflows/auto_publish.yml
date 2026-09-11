@@ -55,13 +55,17 @@ jobs:
           echo ""
           echo "=== FACEBOOK SECRETS ==="
           if [ -z "${FACEBOOK_ACCESS_TOKEN}" ]; then
-            echo "Warning: FACEBOOK_ACCESS_TOKEN not set"
+            echo "❌ ERROR: FACEBOOK_ACCESS_TOKEN secret is not set!"
+            echo "   Please add FACEBOOK_ACCESS_TOKEN in https://github.com/eternityrage/vel-jap-vids/settings/secrets/actions"
+            exit 1
           else
             echo "Found: FACEBOOK_ACCESS_TOKEN"
           fi
 
           if [ -z "${FACEBOOK_PAGE_ID}" ]; then
-            echo "Warning: FACEBOOK_PAGE_ID not set"
+            echo "❌ ERROR: FACEBOOK_PAGE_ID secret is not set!"
+            echo "   Please add FACEBOOK_PAGE_ID in https://github.com/eternityrage/vel-jap-vids/settings/secrets/actions"
+            exit 1
           else
             echo "Found: FACEBOOK_PAGE_ID"
           fi

@@ -294,17 +294,29 @@ def main():
             print(f"[publisher] Threads upload failed: {e}")
 
     # Record publication in log
-    metadata = {
-        "title": title,
-        "description": description,
-        "platforms": success_flags,
-        "website": WEBSITE_URL
-    }
-    mark_as_published(video_name, metadata)
-    print(f"\n[publisher] Marked {video_name} as published in {PUBLISHED_LOG}")
-    print("=" * 60)
-    print(f"PUBLISHING PIPELINE COMPLETE - {PAGE_NAME}")
-    print("=" * 60)
+    if success_flags["facebook_reel"]:
+        metadata = {
+            "title": title,
+            "description": description,
+            "platforms": success_flags,
+            "website": WEBSITE_URL
+        }
+        mark_as_published(video_name, metadata)
+        print(f"\n[publisher] ✅ SUCCESS! Video published to Facebook Reel and marked in {PUBLISHED_LOG}")
+        print("=" * 60)
+        print(f"PUBLISHING PIPELINE COMPLETE - {PAGE_NAME}")
+        print("=" * 60)
+    else:
+        print("\n" + "!" * 60)
+        print("[publisher] ❌ FACEBOOK UPLOAD DID NOT SUCCEED!")
+        print("[publisher] Video has NOT been marked as published.")
+        print("[publisher] To publish to the Velocity Japanese Facebook page, ensure both:")
+        print("  - FACEBOOK_PAGE_ID")
+        print("  - FACEBOOK_ACCESS_TOKEN")
+        print("are configured in GitHub Repository Secrets at:")
+        print("  https://github.com/eternityrage/vel-jap-vids/settings/secrets/actions")
+        print("!" * 60 + "\n")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
