@@ -1,7 +1,7 @@
 """
 Main Automation Pipeline for GitHub Actions - Velocity Japanese
 1. Fetch ONE video from Google Drive (Folder ID: 1o2ntZzxWTogxmK43rPt9Hx1kEzMjLdRf)
-2. Process with FFmpeg (upscale to 1080x1920, audio normalization, loop if <10s)
+2. Process with FFmpeg (upscale to 1080x1920, audio normalization, loop <= 6s to ~12s)
 3. Upload to Facebook Page 'Velocity Japanese' (Reel + Pinned Comment with website link)
 
 FALLBACK: If all videos have been posted, selects a random video for reposting

@@ -9,7 +9,7 @@ This repository automatically fetches Japanese learning videos from Google Drive
 - **Google Drive Integration**: Fetches video files from Google Drive folder `1o2ntZzxWTogxmK43rPt9Hx1kEzMjLdRf` using Google Service Account.
 - **Auto Repost Fallback**: Once all videos from Google Drive have been published, the system automatically transitions into a weighted random repost mode prioritizing videos with the fewest previous posts.
 - **FFmpeg Enhancement**:
-  - Automatically loops videos shorter than 10 seconds to ~12 seconds.
+  - Automatically loops videos of 6 seconds or less 2 times to ~12 seconds (6s + 6s = 12s).
   - Scales to 1080x1920 with high quality Lanczos filter and sharpening.
   - Normalizes audio loudness for crisp voice clarity.
 - **Pollinations AI Japanese Captions**: Generates bilingual titles and descriptions for Japanese learners with vocabulary, grammar tips, and engagement calls-to-action.

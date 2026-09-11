@@ -52,12 +52,16 @@ def process_single_video(video_path):
         return out_path
 
     duration = get_video_duration(video_path)
-    needs_looping = duration is not None and duration < 10
+    # Loop video if 6 seconds or less (<= 6.5s to handle slight container duration variations e.g. 6.04s)
+    # 6s + 6s = 12s (looped to play 2 times, or repeated to reach ~12s)
+    needs_looping = duration is not None and duration <= 6.5
+    loop_count = max(2, int(round(12.0 / duration))) if (needs_looping and duration and duration > 0) else 1
 
     if needs_looping:
-        print(f"[processor] Video duration {duration:.2f}s (< 10s) -> Looping once to ~{duration * 2:.1f}s")
+        expected_dur = duration * loop_count
+        print(f"[processor] Video duration {duration:.2f}s (<= 6s) -> Looping {loop_count} times ({duration:.1f}s x {loop_count} = ~{expected_dur:.1f}s)")
     else:
-        print(f"[processor] Video duration {duration:.2f}s -> No loop needed")
+        print(f"[processor] Video duration {duration:.2f}s (> 6s) -> No loop needed")
 
     # Probe resolution
     cmd_probe = [
@@ -99,19 +103,24 @@ def process_single_video(video_path):
         y_delogo = 1920 - h_delogo - 5
         delogo_filter = f",delogo=x={x_delogo}:y={y_delogo}:w={w_delogo}:h={h_delogo}"
 
-    if needs_looping:
+    if needs_looping and loop_count > 1:
+        splits = "".join(f"[v{i}]" for i in range(loop_count))
+        scale_parts = ";".join(
+            f"[v{i}]scale=1080:1920:flags=lanczos,unsharp=5:5:1.0:5:5:0.0{delogo_filter}[s{i}]"
+            for i in range(loop_count)
+        )
+        concat_inputs = "".join(f"[s{i}]" for i in range(loop_count))
         vf_filter = (
-            f"[0:v]split[v0][v1];"
-            f"[v0]scale=1080:1920:flags=lanczos,unsharp=5:5:1.0:5:5:0.0{delogo_filter}[s0];"
-            f"[v1]scale=1080:1920:flags=lanczos,unsharp=5:5:1.0:5:5:0.0{delogo_filter}[s1];"
-            f"[s0][s1]concat=n=2:v=1:a=0[v]"
+            f"[0:v]split={loop_count}{splits};"
+            f"{scale_parts};"
+            f"{concat_inputs}concat=n={loop_count}:v=1:a=0[v]"
         )
     else:
         vf_filter = f"[0:v]scale=1080:1920:flags=lanczos,unsharp=5:5:1.0:5:5:0.0{delogo_filter}[v]"
 
     if has_audio:
-        if needs_looping:
-            af_filter = "[0:a]aloop=loop=1:size=2e+09[a1];[a1]loudnorm=I=-16:TP=-1.5:LRA=11,dynaudnorm=50:3:0.5[a]"
+        if needs_looping and loop_count > 1:
+            af_filter = f"[0:a]aloop=loop={loop_count - 1}:size=2e+09[a1];[a1]loudnorm=I=-16:TP=-1.5:LRA=11,dynaudnorm=50:3:0.5[a]"
         else:
             af_filter = "[0:a]loudnorm=I=-16:TP=-1.5:LRA=11,dynaudnorm=50:3:0.5[a]"
 
