@@ -44,8 +44,8 @@ def run_pipeline():
 
     print("\nStep 1 complete: Video ready for processing\n")
 
-    # Step 2: Process video with FFmpeg
-    print("STEP 2: Processing video (upscaling + audio normalization)...")
+    # Step 2: Process video with FFmpeg (1080p + Watermark Removal)
+    print("STEP 2: Processing video (1080p Lanczos upscaling + watermark removal + audio enhancement)...")
     from process_videos import process_single_video
 
     processed_video = process_single_video(downloaded)

@@ -1,10 +1,12 @@
 """
 Video Processor - Velocity Japanese
-- Validates resolution & duration
-- Scales/pads to vertical 1080x1920 (Lanczos high quality)
-- Loops short videos (<10s) to ~12s for Instagram/Facebook Reels standards
-- Audio normalization with loudnorm & dynaudnorm
-- Optional watermark removal (REMOVE_WATERMARK=true/false)
+Adopts enhancement & watermark removal pipeline from dok-tk:
+1. Extend short videos (< 10s / <= 6s) to 12 seconds (loop once / 2x)
+2. Upscale video to vertical 1080x1920 (Lanczos high quality)
+3. Sharpening & clarity boost (unsharp mask)
+4. Remove watermark at bottom-right corner (delogo filter)
+5. Ultra high-quality H.264 encode (CRF 16, slow preset, yuv420p)
+6. Audio enhancement (loudnorm normalization + dynamic audio normalization, 192k AAC)
 """
 import os
 import subprocess
@@ -21,10 +23,9 @@ input_dir = os.getenv("LOCAL_INPUT_DIR", "Videos")
 output_dir = "Processed_Videos"
 Path(output_dir).mkdir(parents=True, exist_ok=True)
 
-REMOVE_WATERMARK = os.getenv("REMOVE_WATERMARK", "false").lower() in ("true", "1", "yes")
-
 
 def get_video_duration(video_path):
+    """Get duration of video in seconds using ffprobe."""
     cmd_probe = [
         "ffprobe", "-v", "error",
         "-show_entries", "format=duration",
@@ -32,14 +33,23 @@ def get_video_duration(video_path):
         video_path
     ]
     try:
-        res = subprocess.check_output(cmd_probe).decode("utf-8").strip()
-        return float(res)
+        duration = float(subprocess.check_output(cmd_probe).decode("utf-8").strip())
+        return duration
     except Exception as e:
         print(f"[processor] Could not get duration: {e}")
         return None
 
 
 def process_single_video(video_path):
+    """
+    Process single video:
+    - Checks duration; if < 10s (<= 6.5s), loops 2x to reach ~12s
+    - Upscales to vertical 1080x1920 using Lanczos algorithm
+    - Applies unsharp mask for sharpness & clarity
+    - Removes watermark at bottom-right corner via delogo (w=180, h=80, x=895, y=1835)
+    - Normalizes audio volume (loudnorm + dynaudnorm)
+    - Encodes with CRF 16 slow preset for crisp 1080p
+    """
     if not os.path.exists(video_path):
         print(f"[processor] Error: Video not found: {video_path}")
         return None
@@ -52,16 +62,12 @@ def process_single_video(video_path):
         return out_path
 
     duration = get_video_duration(video_path)
-    # Loop video if 6 seconds or less (<= 6.5s to handle slight container duration variations e.g. 6.04s)
-    # 6s + 6s = 12s (looped to play 2 times, or repeated to reach ~12s)
-    needs_looping = duration is not None and duration <= 6.5
-    loop_count = max(2, int(round(12.0 / duration))) if (needs_looping and duration and duration > 0) else 1
+    needs_looping = duration is not None and duration < 10
 
     if needs_looping:
-        expected_dur = duration * loop_count
-        print(f"[processor] Video duration {duration:.2f}s (<= 6s) -> Looping {loop_count} times ({duration:.1f}s x {loop_count} = ~{expected_dur:.1f}s)")
+        print(f"[processor] Video duration: {duration:.2f}s (< 10s) - Will loop to extend to ~{duration * 2:.1f}s")
     else:
-        print(f"[processor] Video duration {duration:.2f}s (> 6s) -> No loop needed")
+        print(f"[processor] Video duration: {duration:.2f}s - No looping needed")
 
     # Probe resolution
     cmd_probe = [
@@ -75,7 +81,7 @@ def process_single_video(video_path):
         res = subprocess.check_output(cmd_probe).decode("utf-8").strip()
         width, height = map(int, res.split("x"))
     except Exception as e:
-        print(f"[processor] Error getting resolution: {e}")
+        print(f"[processor] Failed to get resolution for {video_path}: {e}")
         width, height = 1080, 1920
 
     # Probe audio
@@ -92,44 +98,50 @@ def process_single_video(video_path):
     except:
         has_audio = False
 
-    print(f"[processor] Input video: {width}x{height}, Has audio: {has_audio}")
+    print(f"[processor] Original size: {width}x{height}")
+    print(f"[processor] Has audio: {'Yes' if has_audio else 'No'}")
 
-    # Build video filter
-    delogo_filter = ""
-    if REMOVE_WATERMARK:
-        w_delogo = 180
-        h_delogo = 80
-        x_delogo = 1080 - w_delogo - 5
-        y_delogo = 1920 - h_delogo - 5
-        delogo_filter = f",delogo=x={x_delogo}:y={y_delogo}:w={w_delogo}:h={h_delogo}"
+    # Bottom-right corner watermark removal coordinates (standard for TikTok / Grok / AI outputs)
+    w_delogo = 180
+    h_delogo = 80
+    x_delogo = 1080 - w_delogo - 5   # 895
+    y_delogo = 1920 - h_delogo - 5   # 1835
 
-    if needs_looping and loop_count > 1:
-        splits = "".join(f"[v{i}]" for i in range(loop_count))
-        scale_parts = ";".join(
-            f"[v{i}]scale=1080:1920:flags=lanczos,unsharp=5:5:1.0:5:5:0.0{delogo_filter}[s{i}]"
-            for i in range(loop_count)
-        )
-        concat_inputs = "".join(f"[s{i}]" for i in range(loop_count))
+    print(f"[processor] Processing {filename}...")
+    print(f"  Upscaling to: 1080x1920 (Lanczos high-res)")
+    print(f"  Removing watermark at bottom-right: x={x_delogo}, y={y_delogo}, w={w_delogo}, h={h_delogo}")
+    print(f"  Video: ENHANCED (sharpen + clarity boost with unsharp mask)")
+    if needs_looping:
+        print(f"  Extension: Looping video (6s -> ~12s)")
+    if has_audio:
+        print(f"  Audio: ENHANCED (normalize volume + improve clarity)")
+    else:
+        print(f"  Audio: No audio in original video")
+
+    delogo_str = f",delogo=x={x_delogo}:y={y_delogo}:w={w_delogo}:h={h_delogo}"
+
+    if needs_looping:
         vf_filter = (
-            f"[0:v]split={loop_count}{splits};"
-            f"{scale_parts};"
-            f"{concat_inputs}concat=n={loop_count}:v=1:a=0[v]"
+            f"[0:v]split[v0][v1];"
+            f"[v0]scale=1080:1920:flags=lanczos,unsharp=5:5:1.0:5:5:0.0{delogo_str}[s0];"
+            f"[v1]scale=1080:1920:flags=lanczos,unsharp=5:5:1.0:5:5:0.0{delogo_str}[s1];"
+            f"[s0][s1]concat=n=2:v=1:a=0[v]"
         )
     else:
-        vf_filter = f"[0:v]scale=1080:1920:flags=lanczos,unsharp=5:5:1.0:5:5:0.0{delogo_filter}[v]"
+        vf_filter = f"[0:v]scale=1080:1920:flags=lanczos,unsharp=5:5:1.0:5:5:0.0{delogo_str}[v]"
 
     if has_audio:
-        if needs_looping and loop_count > 1:
-            af_filter = f"[0:a]aloop=loop={loop_count - 1}:size=2e+09[a1];[a1]loudnorm=I=-16:TP=-1.5:LRA=11,dynaudnorm=50:3:0.5[a]"
+        if needs_looping:
+            af_filter = f"[0:a]aloop=loop=1:size=2e+09[a1];[a1]loudnorm=I=-16:TP=-1.5:LRA=11,dynaudnorm=50:3:0.5[a]"
         else:
-            af_filter = "[0:a]loudnorm=I=-16:TP=-1.5:LRA=11,dynaudnorm=50:3:0.5[a]"
+            af_filter = f"[0:a]loudnorm=I=-16:TP=-1.5:LRA=11,dynaudnorm=50:3:0.5[a]"
 
         cmd_ffmpeg = [
             "ffmpeg", "-y", "-i", video_path,
             "-filter_complex", f"{vf_filter};{af_filter}",
             "-map", "[v]",
             "-map", "[a]",
-            "-c:v", "libx264", "-preset", "slow", "-crf", "18",
+            "-c:v", "libx264", "-preset", "slow", "-crf", "16",
             "-profile:v", "high", "-pix_fmt", "yuv420p",
             "-c:a", "aac", "-b:a", "192k",
             out_path
@@ -139,34 +151,47 @@ def process_single_video(video_path):
             "ffmpeg", "-y", "-i", video_path,
             "-filter_complex", vf_filter,
             "-map", "[v]",
-            "-c:v", "libx264", "-preset", "slow", "-crf", "18",
+            "-c:v", "libx264", "-preset", "slow", "-crf", "16",
             "-profile:v", "high", "-pix_fmt", "yuv420p",
             "-an",
             out_path
         ]
 
-    print(f"[processor] Running ffmpeg enhancement for {filename}...")
+    print("  Processing... (enhancement + watermark removal in progress)")
     result = subprocess.run(cmd_ffmpeg, capture_output=True, text=True)
 
     if result.returncode == 0:
-        print(f"[processor] Enhanced video successfully saved -> {out_path}")
+        print(f"Saved: {out_path} (1080p ENHANCED + WATERMARK REMOVED)")
         return out_path
     else:
-        print(f"[processor] FFmpeg failed with exit code {result.returncode}:")
-        print(result.stderr[-500:])
+        print(f"FFmpeg failed with return code {result.returncode}")
+        print(f"Full error output:")
+        print(result.stderr)
         return None
 
 
 def main():
     specific_video = sys.argv[1] if len(sys.argv) > 1 else None
+
     if specific_video:
-        res = process_single_video(specific_video)
-        if not res:
+        result = process_single_video(specific_video)
+        if result:
+            print("\n" + "=" * 60)
+            print("PROCESSING COMPLETE - 1080p & WATERMARK REMOVED")
+            print("=" * 60)
+        else:
             sys.exit(1)
     else:
         videos = [f for f in os.listdir(input_dir) if f.endswith(('.mp4', '.mov'))]
-        for v in videos:
-            process_single_video(os.path.join(input_dir, v))
+        print(f"Found {len(videos)} videos to process.")
+
+        for filename in videos:
+            vid_path = os.path.join(input_dir, filename)
+            process_single_video(vid_path)
+
+        print("\n" + "=" * 60)
+        print("PROCESSING COMPLETE")
+        print("=" * 60)
 
 
 if __name__ == "__main__":
