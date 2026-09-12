@@ -43,5 +43,20 @@
             },
             "website": "https://velocityjapanese.com"
         }
+    },
+    {
+        "video_name": "grok-0abaf151-7b28-407f-bda7-27f73e4338c6-720p.mp4",
+        "metadata": {
+            "title": "Order, Ride, Smile—Learn Japanese in Japan! 🇯🇵✈️🚆",
+            "description": "Turn everyday moments in Japan into confidence—learn a practical Japanese phrase you can use at restaurants, on trains, and in shops. With Velocity Japanese, you’ll practice conversational vocabulary, pronunciation, and even a touch of kanji so it sticks fast. Save this reel for your next trip and comment your favorite phrase you want to try in real life! Follow Velocity Japanese for daily lessons and cultural tips—let’s speak Japanese with ease. #japanese #learnjapanese #japaneselanguage #nihongo #japaneselesson #velocityjapanese #kanji #japanesevocabulary #dailyjapanese #speakjapanese #studyjapanese #japantravel.",
+            "platforms": {
+                "facebook_reel": true,
+                "facebook_story": true,
+                "instagram_reel": false,
+                "instagram_story": false,
+                "threads": false
+            },
+            "website": "https://velocityjapanese.com"
+        }
     }
 ]
