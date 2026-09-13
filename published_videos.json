@@ -73,5 +73,20 @@
             },
             "website": "https://velocityjapanese.com"
         }
+    },
+    {
+        "video_name": "grok-23c994d9-c655-4580-91bd-cc1034cf01ff-720p.mp4",
+        "metadata": {
+            "title": "Start Speaking Japanese in 5 Minutes! 🇯🇵🔥（にほんご）",
+            "description": "Ready to make Japanese feel easy and fun? In this quick Velocity Japanese reel, you’ll practice a high-impact conversational phrase with friendly pronunciation tips—so you can use it right away. Save this reel for your daily practice and come back whenever you need a confidence boost. Comment your favorite phrase you want to say in Japanese, and follow Velocity Japanese for new lessons every day! #japanese #learnjapanese #japaneselanguage #nihongo #japaneselesson #velocityjapanese #kanji #japanesevocabulary #dailyjapanese #speakjapanese #studyjapanese #japantravel",
+            "platforms": {
+                "facebook_reel": true,
+                "facebook_story": true,
+                "instagram_reel": false,
+                "instagram_story": false,
+                "threads": false
+            },
+            "website": "https://velocityjapanese.com"
+        }
     }
 ]
