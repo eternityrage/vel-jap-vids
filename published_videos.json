@@ -163,5 +163,20 @@
             },
             "website": "https://velocityjapanese.com"
         }
+    },
+    {
+        "video_name": "grok-0b7617bc-e26e-4c52-926a-01a2d0793891-720p.mp4",
+        "metadata": {
+            "title": "すぐ使える日本語！🚆🍜 旅行会話フレーズで現地力UP 🇯🇵",
+            "description": "Ever freeze when the train announces your stop or when the ramen menu looks intimidating? In this Reel, Velocity Japanese shows you practical, everyday Japanese phrases to use in places like restaurants, trains, and shops—so you can travel with confidence. Learn the sound, the meaning, and the cultural “why” behind each line. Save this reel for your next trip and comment your favorite phrase below—then follow Velocity Japanese for daily lessons! #japanese #learnjapanese #japaneselanguage #nihongo #japaneselesson #velocityjapanese #kanji #japanesevocabulary #dailyjapanese #speakjapanese #studyjapanese #japantravel.",
+            "platforms": {
+                "facebook_reel": true,
+                "facebook_story": true,
+                "instagram_reel": false,
+                "instagram_story": false,
+                "threads": false
+            },
+            "website": "https://velocityjapanese.com"
+        }
     }
 ]
