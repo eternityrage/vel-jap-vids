@@ -283,5 +283,20 @@
             },
             "website": "https://velocityjapanese.com"
         }
+    },
+    {
+        "video_name": "grok-23bff870-6233-4926-8812-e576d155835e-720p.mp4",
+        "metadata": {
+            "title": "Ready to speak Japanese on the go? 🇯🇵✈️「ご注文は？」",
+            "description": "Turn “I studied Japanese” into real conversations in Japan—at restaurants, on trains, and while shopping. In this quick Velocity Japanese reel, you’ll learn a practical phrase with easy pronunciation so you can use it right away. Save this reel for your next trip and comment your favorite phrase below—what would you say at a Japanese restaurant? Follow Velocity Japanese for daily lessons, vocabulary, kanji, and cultural tips that make speaking feel natural. #japanese #learnjapanese #japaneselanguage #nihongo #japaneselesson #velocityjapanese #kanji #japanesevocabulary #dailyjapanese #speakjapanese #studyjapanese #japantravel",
+            "platforms": {
+                "facebook_reel": true,
+                "facebook_story": true,
+                "instagram_reel": false,
+                "instagram_story": false,
+                "threads": false
+            },
+            "website": "https://velocityjapanese.com"
+        }
     }
 ]
