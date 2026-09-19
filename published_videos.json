@@ -373,5 +373,20 @@
             },
             "website": "https://velocityjapanese.com"
         }
+    },
+    {
+        "video_name": "grok-35ba487a-ea38-4a84-98d4-30ca17feb39a-720p.mp4",
+        "metadata": {
+            "title": "From ✈️ to 🍜: Japanese You’ll Use on Day 1！🇯🇵✨",
+            "description": "Want Japanese that actually works when you’re out exploring? In this Reel, learn a quick, practical phrase for ordering at restaurants, getting help on trains, and shopping like a local—plus a pronunciation tip to sound natural. Save this reel for your next trip and practice before you land! Comment your favorite travel moment in Japan (or the phrase you want to learn) below, and follow Velocity Japanese for daily lessons.",
+            "platforms": {
+                "facebook_reel": true,
+                "facebook_story": true,
+                "instagram_reel": false,
+                "instagram_story": false,
+                "threads": false
+            },
+            "website": "https://velocityjapanese.com"
+        }
     }
 ]
