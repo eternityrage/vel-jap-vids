@@ -538,5 +538,20 @@
             },
             "website": "https://velocityjapanese.com"
         }
+    },
+    {
+        "video_name": "grok-4bca0531-9e34-4154-9ff9-cffe1b1518f8-720p.mp4",
+        "metadata": {
+            "title": "Unlock Conversational Japanese in 10 Minutes! 🇯🇵⚡️✨ （いま）",
+            "description": "Think learning Japanese has to be hard? Think again—today you’ll master a practical phrase you can use immediately in real conversations. We’ll break down pronunciation, meaning, and a quick cultural tip so it feels fun (not frustrating). Save this reel for later, comment your favorite phrase below, and follow Velocity Japanese for daily lessons you’ll actually stick with!",
+            "platforms": {
+                "facebook_reel": true,
+                "facebook_story": true,
+                "instagram_reel": false,
+                "instagram_story": false,
+                "threads": false
+            },
+            "website": "https://velocityjapanese.com"
+        }
     }
 ]
